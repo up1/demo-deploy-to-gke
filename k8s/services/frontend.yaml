@@ -1,30 +1,14 @@
-kind: Deployment
-apiVersion: extensions/v1beta1
+kind: Service
+apiVersion: v1
 metadata:
   name: gceme-frontend
 spec:
-  replicas:
-  template:
-    metadata:
-      name: frontend
-      labels:
-        app: gceme
-        role: frontend
-        env: staging
-    spec:
-      containers:
-      - name: frontend
-        image: gcr.io/cloud-solutions-images/gceme:1.0.0
-        resources:
-          limits:
-            memory: "500Mi"
-            cpu: "100m"
-        imagePullPolicy: Always
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: 80
-        command: ["sh", "-c", "app -frontend=true -backend-service=http://gceme-backend:8080 -port=80"]
-        ports:
-        - name: frontend
-          containerPort: 80
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: gceme
+    role: frontend
